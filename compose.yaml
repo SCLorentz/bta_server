@@ -1,0 +1,13 @@
+services:
+  minecraft:
+    build:
+      context: .
+    image: bta_server
+    ports:
+      - "25565:25565"
+    volumes:
+      - ./world:/app/world
+      - ./logs:/app/logs
+      - ./ops.txt:/app/ops.txt
+      - ./banned-players.txt:/app/banned-players.txt
+      - ./banned-ips.txt:/app/banned-ips.txt
