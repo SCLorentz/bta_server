@@ -2,6 +2,10 @@
 
 (find a good host platform with support for docker deploy and a good pricing)
 
+## Info and Waringing
+
+The server of BTA is beeing modified to provide better control and optimizations for my usage intent. To open the original/modified server.jar file I'm using jd-cli-0.9.2 on graalvm.
+
 ```fish
 podman compose build
 ```

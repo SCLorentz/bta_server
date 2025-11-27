@@ -1,1 +1,4 @@
-logs/
+logs/*
+jd-cli-0.9.2-dist/*
+server/*
+**/*.java
