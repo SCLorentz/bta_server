@@ -20,8 +20,4 @@ podman compose build
 podman compose up -d
 ```
 
-```fish
-java -jar jd-cli-0.9.2-dist/jd-cli.jar -od server server.jar
-```
-
 <img width="1708" height="960" alt="image" src="images/b.heic" />
