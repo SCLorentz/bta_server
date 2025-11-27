@@ -13,4 +13,4 @@ EXPOSE 8080
 
 #RUN microdnf install nginx
 
-CMD ["java", "-XX:+UseG1GC", "-XX:MaxGCPauseMillis=150", "-XX:InitiatingHeapOccupancyPercent=15", "-XX:+UseStringDeduplication", "-XX:+UseAES", "-XX:+UseFMA", "-XX:+DoEscapeAnalysis", "-XX:+UseCodeCacheFlushing", "-XX:+OptimizeStringConcat", "-XX:+OmitStackTraceInFastThrow", "-Djdk.graal.CompilerConfiguration=community", "-Dsun.awt.noerasebackground=true", "-Dawt.useSystemAAFontSettings=on", "-Dsun.java2d.opengl=true", "-Dsun.java2d.renderer=opengl", "-jar", "/app/server.jar", "--nogui"]
+CMD ["java", "-XX:+UseG1GC", "-XX:+EnableJVMCI", "-XX:+UseJVMCICompiler", "-XX:+UnlockExperimentalVMOptions", "-Djdk.graal.CompilerConfiguration=community", "-XX:MaxGCPauseMillis=150", "-XX:InitiatingHeapOccupancyPercent=15", "-XX:+UseStringDeduplication", "-XX:+UseAES", "-XX:+UseFMA", "-XX:+DoEscapeAnalysis", "-XX:+UseCodeCacheFlushing", "-XX:+OptimizeStringConcat", "-XX:+OmitStackTraceInFastThrow", "-Djdk.graal.CompilerConfiguration=community", "-Dsun.awt.noerasebackground=true", "-Dawt.useSystemAAFontSettings=on", "-Dsun.java2d.opengl=true", "-Dsun.java2d.renderer=opengl", "-jar", "/app/server.jar", "--nogui"]

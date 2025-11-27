@@ -6,6 +6,8 @@ services:
     ports:
       - "25565:25565"
       - "8080:8080"
+    environment:
+      LOG_LEVEL: debug
     volumes:
       - ./world:/app/world
       - ./logs:/app/logs
