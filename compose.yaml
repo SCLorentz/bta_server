@@ -5,9 +5,11 @@ services:
     image: bta_server
     ports:
       - "25565:25565"
+      - "8080:8080"
     volumes:
       - ./world:/app/world
       - ./logs:/app/logs
       - ./ops.txt:/app/ops.txt
       - ./banned-players.txt:/app/banned-players.txt
       - ./banned-ips.txt:/app/banned-ips.txt
+      - ./page:/app/page

@@ -1,23 +1,18 @@
-[22:51:10] [Server thread/INFO]: Starting Better than Adventure! server for version 7.3_04
-[22:51:11] [Server thread/INFO]: Loading properties
-[22:51:11] [Server thread/INFO]: Registered 23 recipes from /recipes/blast_furnace.json
-[22:51:12] [Server thread/INFO]: Registered 24 recipes from /recipes/furnace.json
-[22:51:12] [Server thread/INFO]: Registered 6 recipes from /recipes/trommel.json
-[22:51:12] [Server thread/INFO]: Registered 487 recipes from /recipes/workbench.json
-[22:51:12] [Server thread/INFO]: 32 item groups.
-[22:51:12] [Server thread/INFO]: 543 recipes in 4 groups in 1 namespaces.
-[22:51:12] [Server thread/INFO]: 2944 Translation Keys
-[22:51:12] [Server thread/INFO]: Starting Minecraft server on *:25565
-[22:51:12] [Server thread/INFO]: Preparing level "world"
-[22:51:12] [Server thread/INFO]: Preparing start region for level Dimension: [ ID: 0 Name: the Overworld ]
-[22:51:13] [Server thread/INFO]: Preparing spawn area: 61%
-[22:51:14] [Server thread/INFO]: Preparing spawn area: 81%
-[22:51:14] [Server thread/INFO]: Preparing start region for level Dimension: [ ID: 1 Name: the Nether ]
-[22:51:15] [Server thread/INFO]: Preparing spawn area: 57%
-[22:51:16] [Server thread/INFO]: Preparing spawn area: 65%
-[22:51:17] [Server thread/INFO]: Preparing spawn area: 73%
-[22:51:18] [Server thread/INFO]: Preparing spawn area: 81%
-[22:51:19] [Server thread/INFO]: Preparing spawn area: 93%
-[22:51:20] [Server thread/INFO]: Preparing start region for level Dimension: [ ID: 2 Name: Paradise ]
-[22:51:20] [Server thread/INFO]: Generating RSA key...
-[22:51:20] [Server thread/INFO]: Done (8396707245ns)! For help, type "help" or "?"
+[14:05:08] [Server thread/INFO]: Starting Better than Adventure! server for version 7.3_04
+[14:05:09] [Server thread/INFO]: Loading properties
+[14:05:10] [Server thread/INFO]: Registered 23 recipes from /recipes/blast_furnace.json
+[14:05:10] [Server thread/INFO]: Registered 24 recipes from /recipes/furnace.json
+[14:05:10] [Server thread/INFO]: Registered 6 recipes from /recipes/trommel.json
+[14:05:10] [Server thread/INFO]: Registered 487 recipes from /recipes/workbench.json
+[14:05:10] [Server thread/INFO]: 32 item groups.
+[14:05:10] [Server thread/INFO]: 543 recipes in 4 groups in 1 namespaces.
+[14:05:10] [Server thread/INFO]: 2944 Translation Keys
+[14:05:10] [Server thread/INFO]: Starting Minecraft server on *:25565
+[14:05:10] [Server thread/INFO]: Preparing level "world"
+[14:05:10] [Server thread/INFO]: Preparing start region for level Dimension: [ ID: 0 Name: the Overworld ]
+[14:05:10] [Server thread/INFO]: Preparing start region for level Dimension: [ ID: 1 Name: the Nether ]
+[14:05:10] [Server thread/INFO]: Preparing start region for level Dimension: [ ID: 2 Name: Paradise ]
+[14:05:10] [Server thread/INFO]: Generating RSA key...
+[14:05:10] [Server thread/INFO]: Done (634227691ns)! For help, type "help" or "?"
+[14:05:29] [Server thread/INFO]: sclorentz [/192.168.127.1:52717] logged in with entity id 100 at (-24.468982713716464, 139.37620006687587, 12.572307408566807)
+[14:05:42] [Server thread/INFO]: sclorentz lost connection: disconnect.quitting
