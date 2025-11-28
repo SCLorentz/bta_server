@@ -3,5 +3,5 @@ rm -rf \
 	jd-cli.jar \
 	server/ \
 	logs/ \
-	tmp/
+	.tmp/
 echo "done!"

@@ -1,39 +1,44 @@
-mkdir -p tmp
-cd tmp
+ARCH="macos-arm64"
+mkdir -p "$(pwd)/.tmp"
+cd "$(pwd)/.tmp"
+
 if \
 	[ -e "bta.v7.3.client.jar" ] \
-	&& [ -e "legacy-lwjgl3-bta-1.0.6.jar" ]; then
+	&& [ -e "legacy-lwjgl3-bta-1.0.6.jar" ] \
+	&& [ -e "client.jar" ]; then
 		echo "libraries already downloaded. Skipping"
 else
-	echo "downloading resources (this may take a while)..."
-	wget https://github.com/Better-than-Adventure/bta-download-repo/releases/download/v7.3/bta.v7.3.client.jar \
-	https://github.com/Better-than-Adventure/legacy-lwjgl3/releases/download/1.0.6/legacy-lwjgl3-bta-1.0.6.jar \
-	https://launcher.mojang.com/v1/objects/43db9b498cb67058d2e12d394e6507722e71bb45/client.jar \
-	https://github.com/LWJGL/lwjgl3/releases/download/3.3.6/lwjgl-3.3.6.zip &> /dev/null
+	echo "downloading libraries..."
+	cp ../scripts/pom.xml .
+	mvn dependency:copy-dependencies -q
+	find target/dependency -type f -name '*.jar' -exec mv {} . \;
+	rm -rf target/dependency
+
+	echo "dowloading minecraft..."
+	for f in \
+		https://github.com/Better-than-Adventure/bta-download-repo/releases/download/v7.3/bta.v7.3.client.jar \
+		https://github.com/Better-than-Adventure/legacy-lwjgl3/releases/download/1.0.6/legacy-lwjgl3-bta-1.0.6.jar \
+		https://launcher.mojang.com/v1/objects/43db9b498cb67058d2e12d394e6507722e71bb45/client.jar #!!!!
+	do
+		wget $f -q --show-progress
+	done
+
 	echo "unpacking libs..."
-	mkdir -p lwjgl
-	unzip lwjgl-3.3.6.zip -d lwjgl/ >> /dev/null
-	mv \
-		lwjgl/lwjgl/lwjgl.jar \
-		lwjgl/lwjgl/lwjgl-natives-macos-arm64.jar \
-		lwjgl/lwjgl-opengl/lwjgl-opengl.jar \
-		lwjgl/lwjgl-opengl/lwjgl-opengl-natives-macos-arm64.jar \
-		lwjgl/lwjgl-stb/lwjgl-stb.jar \
-		lwjgl/lwjgl-stb/lwjgl-stb-natives-macos-arm64.jar \
-		lwjgl/lwjgl-glfw/lwjgl-glfw.jar \
-		lwjgl/lwjgl-glfw/lwjgl-glfw-natives-macos-arm64.jar \
-		lwjgl/lwjgl-openal/lwjgl-openal.jar \
-		lwjgl/lwjgl-openal/lwjgl-openal-natives-macos-arm64.jar \
-		./
-	rm -rf lwjgl/
-	echo "extracting natives..."
-	unzip -o lwjgl-natives-macos-arm64.jar -d natives
-	unzip -o lwjgl-glfw-natives-macos-arm64.jar -d natives
-	unzip -o lwjgl-opengl-natives-macos-arm64.jar -d natives
-	unzip -o lwjgl-stb-natives-macos-arm64.jar -d natives
-	unzip -o lwjgl-openal-natives-macos-arm64.jar -d natives
-	mv ./natives/**/*.dylib ./
-	rm -rf natives/
+	mkdir natives
+
+	for f in \
+		lwjgl-3.3.6-natives-$ARCH.jar \
+		lwjgl-opengl-3.3.6-natives-$ARCH.jar \
+		lwjgl-stb-3.3.6-natives-$ARCH.jar \
+		lwjgl-glfw-3.3.6-natives-$ARCH.jar \
+		lwjgl-openal-3.3.6-natives-$ARCH.jar
+	do
+		[ -f "$f" ] && echo OK "$f" || echo MISSING "$f"
+		unzip -n "$f" -d natives >> /dev/null
+	done
+
+	find natives -type f -name '*.dylib' -exec mv {} . \;
+	rm -rf lwjgl/ natives/
 fi
 echo "starting minecraft..."
 exec java -XstartOnFirstThread \
