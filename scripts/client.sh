@@ -10,18 +10,28 @@ if \
 else
 	echo "downloading libraries..."
 	cp ../scripts/pom.xml .
-	mvn dependency:copy-dependencies -q
+	mvn --log-file ./mvn.log dependency:copy-dependencies &> /dev/null || {
+		echo "Something went wrong while using maven. Check the logs in $(pwd)/mvn.log"
+	}
 	find target/dependency -type f -name '*.jar' -exec mv {} . \;
-	rm -rf target/dependency
+	rm -rf target pom.xml
+	echo "done!"
 
-	echo "dowloading minecraft..."
+	echo "dowloading bta..."
 	for f in \
 		https://github.com/Better-than-Adventure/bta-download-repo/releases/download/v7.3/bta.v7.3.client.jar \
 		https://github.com/Better-than-Adventure/legacy-lwjgl3/releases/download/1.0.6/legacy-lwjgl3-bta-1.0.6.jar \
-		https://launcher.mojang.com/v1/objects/43db9b498cb67058d2e12d394e6507722e71bb45/client.jar #!!!!
+		https://piston-meta.mojang.com/mc/game/version_manifest.json
 	do
 		wget $f -q --show-progress
 	done
+
+	# https://jqlang.org/manual/#builtin-operators-and-functions
+	echo "reading piston-meta.mojang.com"
+	wget $(cat version_manifest.json | jq -r '.versions[] | select(.id == "b1.7.3").url') -q --show-progress
+	wget $(cat b1.7.3.json | jq -r '.downloads.client.url') -q --show-progress
+	
+	rm -rf b1.7.3.json version_manifest.json
 
 	echo "unpacking libs..."
 	mkdir natives
@@ -40,7 +50,7 @@ else
 	find natives -type f -name '*.dylib' -exec mv {} . \;
 	rm -rf lwjgl/ natives/
 fi
-echo "starting minecraft..."
+echo "starting minecraft...\n"
 exec java -XstartOnFirstThread \
 	-Djava.library.path="$(pwd)" \
 	-cp "$(pwd)/client.jar:$(pwd)/bta.v7.3.client.jar:$(pwd)/legacy-lwjgl3-bta-1.0.6.jar:$(pwd)/lwjgl.jar:$(pwd)/lwjgl-glfw.jar:$(pwd)/lwjgl-opengl.jar:$(pwd)/lwjgl-openal.jar:$(pwd)/lwjgl-stb.jar" \
