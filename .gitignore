@@ -4,3 +4,4 @@ server/*
 **/*.java
 .tmp/*
 **/*.jar
+**/*.class

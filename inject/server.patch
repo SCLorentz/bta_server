@@ -1,0 +1,162 @@
+--- ../server/net/minecraft/core/item/Item.java	2025-11-30 19:13:57
++++ ./net/minecraft/core/item/Item.java	2025-11-30 15:48:33
+@@ -63,7 +63,7 @@
+   protected final Map<String, Stat> stats = new HashMap<>();
+   
+   public Item(NamespaceID namespaceId, int id) {
+-    this.maxStackSize = 64;
++    this.maxStackSize = 100;
+     this.maxDamage = 0;
+     this.hasSubtypes = false;
+     this.containerItem = null;
+@@ -307,4 +307,4 @@
+   public static Item getItem(int id) {
+     return itemsList[Math.max(id, 0)];
+   }
+-}
++}
+\ No newline at end of file
+--- ../server/net/minecraft/server/entity/player/PlayerServer.java	2025-11-30 19:13:57
++++ ./net/minecraft/server/entity/player/PlayerServer.java	2025-11-30 19:13:21
+@@ -156,6 +156,10 @@
+     return super.getBb();
+   }
+   
++  public UUID getUuid() {
++    return this.uuid;
++  }
++  
+   public void awardKillScore(Entity entity, int i) {
+     super.awardKillScore(entity, i);
+     this.mcServer.playerList.updatePlayerProfile(this.username, this.nickname, this.uuid, this.score, this.chatColor, true, isOperator());
+@@ -230,7 +234,7 @@
+       } 
+       name = TextFormatting.ITALIC + name;
+       if (nickNum > 0)
+-        name = name + " (" + nickNum + ")"; 
++        name = String.format("%s (%d)", name, nickNum); 
+     } 
+     return TextFormatting.get(this.chatColor) + name;
+   }
+@@ -275,6 +279,7 @@
+       } 
+     } 
+     if (this.inPortal) {
++      // This looks bad
+       Dimension targetDim = ((BlockLogicPortal)Blocks.blocksList[this.portalID].getLogic()).targetDimension;
+       boolean netherAllowed = this.mcServer.propertyManager.getBooleanProperty("allow-nether", true);
+       boolean paradiseAllowed = this.mcServer.propertyManager.getBooleanProperty("allow-paradise", false);
+@@ -394,10 +399,9 @@
+   }
+   
+   public void startRiding(IVehicle vehicle) {
+-    if (!canRide())
++    if (!canRide() && this.vehicle == vehicle)
+       return; 
+-    if (this.vehicle == vehicle)
+-      return; 
++
+     super.startRiding(vehicle);
+     if (vehicle instanceof Entity) {
+       this.playerNetServerHandler.sendPacket(new PacketSetRiding(this, (Entity)this.vehicle));
+@@ -548,14 +552,13 @@
+   }
+   
+   public void addStat(Stat stat, int i) {
+-    if (stat == null)
++    if (stat == null || stat.clientside)
+       return; 
+-    if (!stat.clientside) {
+-      for (; i > 100; i -= 100)
+-        this.playerNetServerHandler.sendPacket(new PacketStatistic(stat.statId, 100)); 
+-      if (i > 0)
+-        this.playerNetServerHandler.sendPacket(new PacketStatistic(stat.statId, i)); 
+-    } 
++
++    for (; i > 100; i -= 100)
++      this.playerNetServerHandler.sendPacket(new PacketStatistic(stat.statId, 100)); 
++    if (i > 0)
++      this.playerNetServerHandler.sendPacket(new PacketStatistic(stat.statId, i)); 
+   }
+   
+   public void func_30002_A() {
+--- ../server/net/minecraft/server/net/PlayerList.java	2025-11-30 19:13:57
++++ ./net/minecraft/server/net/PlayerList.java	2025-11-30 18:56:51
+@@ -99,6 +99,7 @@
+     saveBannedList();
+     saveOps();
+     saveWhiteList();
++	// That does not look good
+     if (this.awaitedLoadThreads.get() > 0)
+       new Thread(() -> {
+             long startTime = System.currentTimeMillis();
+@@ -170,35 +171,40 @@
+     this.playerEntities.remove(entityplayermp);
+     getPlayerManager(entityplayermp.dimension).removePlayer(entityplayermp);
+   }
+-  
++
+   public PlayerServer getPlayerForLogin(PacketHandlerLogin handler, String username, UUID uuid) {
+-    if (this.bans.contains(uuid)) {
+-      handler.kickUser("You are banned from this server!");
+-      return null;
+-    } 
+-    if (!isAllowedToLogin(uuid)) {
+-      handler.kickUser("You are not white-listed on this server!");
+-      return null;
+-    } 
+     String ip = handler.netManager.getRemoteAddress().toString();
+     ip = ip.substring(ip.indexOf("/") + 1);
+     ip = ip.substring(0, ip.indexOf(":"));
+-    if (this.ipBans.contains(ip)) {
+-      handler.kickUser("Your IP address is banned from this server!");
++
++    boolean isIpBan = this.ipBans.contains(ip);
++    if (isIpBan || this.bans.contains(uuid)) {
++      handler.kickUser(String.format("You have been banned from this server! ip ban? %b", isIpBan));
+       return null;
+-    } 
+-    if (this.playerEntities.size() >= (MinecraftServer.getInstance()).maxPlayers) {
+-      handler.kickUser("The server is full!");
++    }
++
++    if (!this.whitelist.contains(uuid) && whitelistEnforced) {
++      handler.kickUser("Not allowed in whitelist!");
+       return null;
+-    } 
+-    List<PlayerServer> playerListCopy = new ArrayList<>(this.playerEntities);
+-    for (PlayerServer player : playerListCopy) {
+-      if (player.username.equalsIgnoreCase(username) || player.uuid.equals(uuid))
+-        player.playerNetServerHandler.kickPlayer("You are logged in from another location!"); 
+-    } 
++    }
++
++    int maxPlayers = MinecraftServer.getInstance()).maxPlayers;
++    if (this.playerEntities.size() >= maxPlayers {
++      handler.kickUser(String.format("The maximum capacity of the server (%d players) has been reached!", maxPlayers));
++      return null;
++    }
++
++    Set<UUID> playerList = this.playerEntities.stream()
++        .map(PlayerServer::getUuid())
++        .collect(Collectors.toSet());
++
++    if (playerList.contains(uuid)) {
++      player.playerNetServerHandler.kickPlayer("Your account is logged somewhere else!");
++    }
++
+     return new PlayerServer(this.server, this.server.getDimensionWorld(0), username, uuid, new ServerPlayerController(this.server.getDimensionWorld(0)));
+   }
+-  
++
+   public PlayerServer recreatePlayerEntity(PlayerServer previousPlayer, int dimension) {
+     this.server.getEntityTracker(previousPlayer.dimension).removeTrackedPlayerSymmetric(previousPlayer);
+     this.server.getEntityTracker(previousPlayer.dimension).untrackEntity(previousPlayer);
+@@ -459,6 +465,7 @@
+           this.awaitedLoadThreads.addAndGet(1);
+           UUIDHelper.runConversionAction(entry, uuid -> {
+                 this.whitelist.add(uuid);
++                this.whitelist.addAll(this.ops);
+                 this.awaitedLoadThreads.addAndGet(-1);
+               }, username -> this.awaitedLoadThreads.addAndGet(-1));
+           continue;
